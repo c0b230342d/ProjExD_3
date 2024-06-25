@@ -7,12 +7,11 @@ import pygame as pg
 
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
-NUM_OF_BOMBS = 10  # 爆弾の数を表す定数
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
-    """  
+    """
     オブジェクトが画面内or画面外を判定し，真理値タプルを返す関数
     引数：こうかとんや爆弾，ビームなどのRect
     戻り値：横方向，縦方向のはみ出し判定結果（画面内：True／画面外：False）
@@ -148,8 +147,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     beam = None
-    # bomb = ((255, 0, 0), 10)
-    bombs = [Bomb((255, 0, 0), 10) for i in range(NUM_OF_BOMBS)]
+    bomb = Bomb((255, 0, 0), 10)
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -162,42 +160,35 @@ def main():
         screen.blit(bg_img, [0, 0])
         
         #こうかとんと爆弾の衝突判定(ゲームオーバー)
-        for i in bombs:
-            if i is not None:
-                if bird.rct.colliderect(i.rct):
-                    # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
-                    bird.change_img(8, screen)
+        if bomb is not None:
+            if bird.rct.colliderect(bomb.rct):
+                # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
+                bird.change_img(8, screen)
+                pg.display.update()
+                time.sleep(1)
+                return
+
+        #ビームと爆弾の衝突判定    
+        if bomb is not None:
+            if beam is not None:
+                if bomb.rct.colliderect(beam.rct):
+                    #爆弾とビームが衝突したら、どちらもNoneにする
+                    beam = None
+                    bomb = None
+                    bird.change_img(6, screen)
                     pg.display.update()
-                    time.sleep(1)
-                    return
-
-        #ビームと爆弾の衝突判定
-        # for i, bomb in enumerate(bombs):
-        for i in range(len(bombs)):    
-            if bombs[i] is not None:
-                if beam is not None:
-                    if bombs[i].rct.colliderect(beam.rct):
-                        #爆弾とビームが衝突したら、どちらもNoneにする
-                        beam = None
-                        bombs[i] = None
-                        bird.change_img(6, screen)
-                        pg.display.update()
-
-        # for i in range(len(bombs)):
-        #     if bombs[i] is None:
-        #         bombs.pop(i)
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         if beam is not None:
             beam.update(screen) 
-        for i in range(len(bombs)):
-            if bombs[i] is not None:  
-                bombs[i].update(screen)
+        if bomb is not None:  
+            bomb.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
 
+        bombs = [i for i in bombs if i is not None]
 
 if __name__ == "__main__":
     pg.init()
