@@ -193,6 +193,7 @@ def main():
         tmr += 1
         clock.tick(50)
 
+        bombs = [i for i in bombs if i is not None]
 
 if __name__ == "__main__":
     pg.init()
