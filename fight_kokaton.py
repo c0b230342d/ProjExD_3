@@ -105,8 +105,8 @@ class Beam:
         self.vx, self.vy = bird.dire
         self.kakudo = math.atan2(-self.vy, self.vx)
         self.img = pg.transform.rotozoom(self.img, math.degrees(self.kakudo), 1.0)
-        self.rct.height = self.rct.centery + bird.rct.centery * self.vy/5
-        self.rct.width = (self.rct.right - self.rct.left) + (bird.rct.right - bird.rct.left) * self.vx/5
+        self.rct.height = self.rct.centery + bird.rct.centerx * self.vy/5
+        self.rct.width = self.rct.width + bird.rct.width * self.vx/5
 
     def update(self, screen: pg.Surface):
         """
