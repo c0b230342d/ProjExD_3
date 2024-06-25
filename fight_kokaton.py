@@ -173,21 +173,25 @@ class Explosion:
         2つのSurfaceをリストに格納
         引数: bombを標示
         """
-        self.img = [pg.image.load(f"fig/explosion.gif"), 
-                    pg.transform.flip(pg.image.load(f"fig/explosion.gif"), True, True)]
-        self.rct = self.img[0].get_rect() 
-        self.rct.center = bomb.rct.center 
+        img1 = pg.image.load(f"fig/explosion.gif")
+        img2 = pg.transform.flip(img1, True, True)
+        self.img_lst = [img1, img2]
+        for i in self.img_lst:
+            self.rct = i.get_rect()
+        self.rct.center = bomb.rct.center
         self.life = 10
 
     def update(self, screen: pg.Surface):
         """
         lifeに応じたsurfaceを標示
         引数: screen
-        """
+        """ 
         self.life -= 1
         if self.life > 0:
-            for i in self.img:
-                screen.blit(i, self.rct)
+            if 0 <= self.life % 10 <= 5:
+                screen.blit(self.img_lst[0], self.rct.center)
+            else:
+                screen.blit(self.img_lst[1], self.rct.center)
 
 
 def main():
@@ -233,13 +237,12 @@ def main():
                 if beams[j] is not None:
                     if bombs[i] is not None:
                         if bombs[i].rct.colliderect(beams[j].rct):
+                            new_exp = Explosion(bombs[i])
+                            explosion.append(new_exp)
                             bombs[i] = None
                             beams[j] = None
                             bird.change_img(6, screen)
                             Score.num += 1
-                            new_exp = Explosion(bombs[i])
-                            explosion.append(new_exp)
-                            print(explosion)
 
         bombs = [bomb for bomb in bombs if bomb is not None]
         beams = [bm for bm in beams if bm is not None]
