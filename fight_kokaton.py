@@ -171,6 +171,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     beam = None
+    beams = []  # 複数のビームを扱うための空のリスト
     # bomb = Bomb((255, 0, 0), 10)
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     score = Score()
@@ -183,6 +184,7 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
                 beam = Beam(bird)
+                beams.append(beam)
         screen.blit(bg_img, [0, 0])
         
         #こうかとんと爆弾の衝突判定
@@ -201,20 +203,29 @@ def main():
 
         #爆弾とビームの衝突判定
         for i in range(len(bombs)):
-            if beam is not None:
-                if bombs[i].rct.colliderect(beam.rct):
-                    bombs[i] = None
-                    beam = None
-                    bird.change_img(6, screen)
-                    Score.num += 1
-            
+            for j in range(len(beams)):
+                if beams[j] is not None:
+                    if bombs[i] is not None:
+                        if bombs[i].rct.colliderect(beams[j].rct):
+                            bombs[i] = None
+                            beams[j] = None
+                            bird.change_img(6, screen)
+                            Score.num += 1
 
         bombs = [bomb for bomb in bombs if bomb is not None]
+        beams = [bm for bm in beams if bm is not None]
+
+        # ビームが画面外に出たら、リストから削除
+        # print(beams)
+        for i, bm in enumerate(beams):
+            if check_bound(bm.rct) != (True, True):
+                del beams[i]
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        if beam is not None:
-            beam.update(screen)
+        for bm in beams:
+            bm.update(screen)
+
         for bomb in bombs:
             bomb.update(screen)
         score.update(screen)
