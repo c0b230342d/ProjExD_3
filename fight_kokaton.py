@@ -151,7 +151,7 @@ class Score:
         スコアを生成するSurfaceを作る
         """
         self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
-        self.img = self.fonto.render("スコア: " + str(self.num) , 0, (0, 0, 255))
+        self.img = self.fonto.render(f"スコア: {str(self.num)}", 0, (0, 0, 255))
         self.rct = self.img.get_rect()
         self.rct.center = (100, HEIGHT-50)
         
